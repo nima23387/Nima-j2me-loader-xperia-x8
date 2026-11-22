@@ -1,0 +1,53 @@
+
+name: Build Nima X8 Java Emulator
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Nima-X8-Source.zip'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 34
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Extract source
+        run: |
+          mkdir source
+          unzip -q Nima-X8-Source.zip -d source
+          WRAPPER=$(find source -name gradlew -type f -print -quit)
+          if [ -z "$WRAPPER" ]; then
+            echo "Gradle wrapper not found!"
+            exit 1
+          fi
+          echo "PROJECT_DIR=$(dirname "$WRAPPER")" >> "$GITHUB_ENV"
+
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR"
+          chmod +x gradlew
+          ./gradlew --no-daemon clean :app:assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nima-X8-Java-Emulator-APK
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
