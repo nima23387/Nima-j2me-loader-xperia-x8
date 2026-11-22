@@ -22,8 +22,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" --install "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
       - name: Install Android SDK 34
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
