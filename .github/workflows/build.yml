@@ -38,7 +38,16 @@ jobs:
           yes | "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --licenses
           "$SDKMANAGER" --sdk_root="$ANDROID_HOME" "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
-      - name: Extract project
+            - name: Extract project
+        run: |
+          mkdir source
+          python3 -c "import zipfile; z=zipfile.ZipFile('Nima-X8-Source.zip'); z.extractall('source')"
+          WRAPPER=$(find source -name gradlew -type f -print -quit)
+          if [ -z "$WRAPPER" ]; then
+            echo "Gradle wrapper not found!"
+            exit 1
+          fi
+          echo "PROJECT_DIR=$(dirname "$WRAPPER")" >> "$GITHUB_ENV"
         run: |
           mkdir source
           unzip -q Nima-X8-Source.zip -d source
