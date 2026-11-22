@@ -30,7 +30,7 @@ jobs:
           cd /tmp
           curl -L https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o tools.zip
           unzip -q tools.zip -d android-cli
-          cp -a android-cli/cmdline-tools/. "$ANDROID_HOME/cmdline-tools/latest/"
+          cp -r android-cli/cmdline-tools/. "$ANDROID_HOME/cmdline-tools/latest/"
 
       - name: Install Android SDK
         run: |
